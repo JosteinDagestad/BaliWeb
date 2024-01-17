@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gender Prediction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+</head>
+<body>
+    <h1>Gender Prediction</h1>
+    <img src="{{ url_for('video_feed') }}" alt="Video Feed">
+    
+    <!-- Start/Stop Analysis Button -->
+    <button class="btn btn-primary" onclick="toggleAnalysis()">Start/Stop</button>
+
+    <!-- Analysis Results -->
+    <div id="analysis_results">Dominant Gender: N/A, Probability Male: 0.00, Probability Female: 0.00</div>
+    
+    <script>
+        // Initialize WebSocket connection to the server
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        
+        // Function to toggle analysis
+        function toggleAnalysis() {
+            socket.emit('toggle_analysis');
+        }
+        
+        // Listen for updates from the server
+        socket.on('update_analysis', function(data) {
+            // Update the HTML elements with the analysis results
+            document.getElementById('analysis_results').textContent = 'Dominant Gender: ' + data.last_detected_gender +
+                ', Probability Male: ' + data.last_probability_male.toFixed(2) +
+                ', Probability Female: ' + data.last_probability_female.toFixed(2);
+        });
+    </script>
+</body>
+</html>
